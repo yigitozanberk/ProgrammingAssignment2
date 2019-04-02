@@ -1,0 +1,253 @@
+---
+title: "RP_Week4"
+author: "yob"
+date: "4/2/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
+## Week 4 - Simulation and Profiling
+
+* calling the str function on an arbitrary R object
+
+*describing the difference between the "by.self" and "by.total" output produced by the R profiler
+
+*simulating a random normal variable with an arbitrary mean and standard deviation
+
+*simulating data from a normal linear model
+
+##MOST IMPORTANT FUNCTION IN R - str()
+
+supposed to compactly display the internal structure of an R object.
+
+roughly one line per basic object
+
+a diagnostic function and an alternative to summary()
+
+"what's in this object?"
+
+```{r}
+str(str)
+
+str(lm)
+```
+
+```{r}
+x <- rnorm(100, 2, 4)
+
+summary(x)
+
+str(x)
+
+f<- gl(40, 10)
+
+str(f)
+
+summary(f)
+
+library(datasets)
+
+head(airquality)
+
+str(airquality)
+
+m <- matrix(rnorm(100), 10, 10)
+
+str(m)
+
+m[, 1]
+
+s<- split(airquality, airquality$Month)
+
+str(s)
+
+
+
+```
+
+## SIMULATION - Generating Random Numbers
+
+rnorm : generate random Normal variates with a given mean and standard deviation
+
+dnorm: evaluate the Normal probability density(with a given mean/SD) at a point (or vector of points)
+
+pnorm: evaluate the cumulative distributive function for a Normal distribution
+
+rpois: generate random Poisson variates with a given rate
+
+
+d for density
+
+r for random number generation
+
+p for cumulative distribution
+
+q for quantile function
+
+
+every distribution has these four types of function
+
+
+* if phi is the cumulative distribution for a standard Normal distribution, then pnorm(q) = phi(q) and qnorm(p)= phi^-1(p)
+
+```{r}
+x <- rnorm(10)
+x
+
+x<- rnorm(10, 20, 2)
+
+summary(x)
+
+set.seed(1)
+
+rnorm(5)
+
+
+```
+
+when you generate random numbers in a pc, they are not random.
+
+they are sudo random numbers.
+
+setting random number seed with set.seed ensures reproducibility
+
+```{r}
+set.seed(1)
+
+rnorm(5)
+
+rnorm(5) #gives different result
+
+#but if you set the seed again
+
+set.seed(1)
+
+rnorm(5) # you get the same answer.
+
+
+```
+
+
+Generating Poisson data
+
+```{r}
+rpois(10, 1)
+
+rpois(10, 2)
+
+rpois(10, 20)
+
+ppois(2, 2) #Pr(x <= 2)
+
+ppois(4, 2) # Pr(x <= 4)
+
+ppois(6, 2) # Pr(x <= 6)
+
+
+```
+
+
+## Simulating a Linear Model
+
+```{r}
+set.seed(20)
+
+x <- rnorm(100) # predictor
+
+e <- rnorm(100, 0, 2) #noise
+
+y <- 0.5 + 2 *x + e 
+
+summary(y)
+
+plot(x, y)
+
+
+```
+
+what if x is a binary random variable, instead of a Normal random variable (gender, or treatment group, etc.)
+
+```{r}
+set.seed(10)
+
+x <- rbinom(100, 1, 0.5)
+
+e <- rnorm(100, 0, 2) # noise
+
+y <- 0.5 + 2*x + e
+
+summary(y)
+
+plot(x, y)
+```
+
+suppose we want to simulate from a Poisson model
+
+maybe an outcome data with count variables instead of continuous variables.
+
+```{r}
+set.seed(1)
+
+x <- rnorm(100) # standard Normal distribution
+
+log.mu <- 0.5 + 0.3 * x #log of mean mu
+
+y <- rpois(100, exp(log.mu))
+
+summary(y)
+
+plot(x, y)
+
+```
+
+
+## Random Sampling
+
+sample() function
+
+draws randomly from a specified set of (scalar) objects allowing you to sample from arbitrary distributions
+
+```{r}
+set.seed(1)
+
+sample(1:10, 4)
+
+sample(1:10, 4)
+
+sample(letters, 5)
+
+sample(1:10) # permutation
+
+sample(1:10, replace = TRUE) # sample w/ replacement
+
+```
+
+-------- R PROFILER Part 1----------
+

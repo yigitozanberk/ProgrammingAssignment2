@@ -251,3 +251,150 @@ sample(1:10, replace = TRUE) # sample w/ replacement
 
 -------- R PROFILER Part 1----------
 
+
+If something's taking a long time, the profiler is handy to figure out why, and how to solve with strategies.
+
+profiling is a systematic way to examine how much time is spend in different parts of a program
+
+often code runs fine once, but what if you have to put it in a loop for 1,000 iterations? is it still fast enough?
+
+profiling is better than guessing
+
+- getting biggest impact on speeding up code depends on knowing where the code spends most of its time.
+
+-time performance should not be your first concern. first concern is writing a program that works, that is readable.
+
+you never optimize first. premature optimization is the root of all evil.
+
+measure (collect data), don't guess
+
+##system.time()
+
+takes and arbitrary R expression as input, and returns the amount of time taken to evaluate the expression.
+
+computes the time(in seconds) needed to execute and expression.
+
+if there's an error, gives time until the error occured
+
+returns an object of class proc_time
+
+user time : time charged to the CPU's for this expression
+
+elapsed time : "wall clock" time
+
+usually the user time and elapsed time are relatively close, for straight computing tasks.
+
+elapsed time may be greater than the user time if the CPU spends a lot of time waiting around.
+
+elapsed time may be smaller than user time if your machine has multiple cores/processors and is capable of using them
+
+multi-threaded BLAS libraries(vecLib/Accelerate, ATLAS, ACML, MKL) (basic algebra optimized functions)
+
+parallel processing via the *parallel* package
+
+```{r}
+system.time(readLines("https://www.jhsph.edu"))
+
+
+# chunk of the time is waiting for the network to get the daya
+
+hilbert <- function(n){
+        i <- 1:n
+        1/outer(i-1, i, "+")
+}
+
+x<- hilbert(1000)
+system.time(svd(x))
+
+system.time({
+        n <- 1000
+        r <- numeric(n)
+        for(i in 1:n) {
+                x <- rnorm(n)
+                r[i] <- mean(x)
+        }
+})
+```
+
+for little pieces of code, system.time() is great. 
+
+problem is , it assumes you already know where the problem is, and can call system.time() on it.
+
+what if you don't know where to start?
+
+## PROFILER 2
+
+USING Rprof()
+
+*summaryRprof() function summarizes the output from Rprof() (otherwise it's not readable) *
+
+DO NOT use system.time() and Rprof() together or you will be sad.
+
+Rprof() keeps track of the function call stack at regularly sampled intervals and tabulates how much time is spend in each function
+
+default sampling interval is 0.02 seconds
+NOTE: if your code runs very quickly, the profiler is not useful, but then you probably don't need it in that case
+
+there are two methods for normalizing the data
+
+"by.total" divides the time spend in each function by the total run time
+
+"by.self" does the same but first subtracts out time spent in functions above in the call stack ***** it is important to see this. the real value.
+
+all the computation is done in the lower level functions. 
+
+##usage:
+
+
+
+Rprof("path_to_hold_output")
+## some code to be profiled
+Rprof(NULL)
+## some code NOT to be profiled
+Rprof("path_to_hold_output", append=TRUE)
+## some code to be profiled
+Rprof(NULL)
+ 
+# summarize the results
+summaryRprof("path_to_hold_output")
+
+
+##SWIRL EXCERCIES
+
+looking at data
+
+class()
+
+dim()
+
+names()
+
+head()
+
+tail()
+
+summary()
+
+table(data$ColName)
+
+str()
+
+##SWIRL - SIMULATION
+
+sample()
+
+sample(c(0, 1), 100, replace = TRUE, prob = c(0.3 , 0.7))
+
+rbinom()
+
+rnorm()
+
+colMeans()
+
+hist()
+
+
+
+
+
+
